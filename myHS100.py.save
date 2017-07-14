@@ -1,0 +1,31 @@
+import time
+from pyHS100 import SmartPlug, TPLinkSmartHomeProtocol
+from pprint import pformat as pf
+
+timeout=5
+
+suspectPlug = ""
+devs = TPLinkSmartHomeProtocol.discover(timeout=timeout)
+
+devToFind = 'Smart Plug 1'
+devIP = ""
+foundDev = False
+
+print("Now searching for device")
+while not foundDev:
+    for devId in devs:
+        alias = devId['sys_info']['system']['get_sysinfo']['alias']
+        if alias == devToFind:
+            devIP = devId['ip']
+            foundDev = True
+
+if foundDev:
+    print("Setting up control loop with %s: %s" % (devToFind, devIP))
+    plug = SmartPlug(devIP)
+
+    print("Turning on")
+    plug.turn_on()
+    time.sleep(10)
+    print("Turning off")
+    plug.turn_off()
+    time.sleep(10)
